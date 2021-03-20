@@ -57,7 +57,7 @@ LMs = [
         "label": "bert_2000_2009",
         "models_names": ["bert_2000_2009"],
         "bert_model_name": "bert_2000_2009",
-        "bert_model_dir": "~/temporal_bert/bert/results/BERT_2000-9_base_4epochs_cased",
+        "bert_model_dir": "/home/guyrosin/temporal_bert/bert/results/BERT_2000-9_base_4epochs_cased",
     },
     # {
     #     "lm": "bert",

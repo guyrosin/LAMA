@@ -1,5 +1,5 @@
 {
-    "python.pythonPath": "/home/guyrosin/miniconda3/envs/lama37/bin/python",
+    "python.pythonPath": "/home/guyrosin/miniconda3/envs/pt/bin/python",
     "terminal.integrated.env.linux": {
         "PYTHONPATH": "${workspaceFolder}"
     },

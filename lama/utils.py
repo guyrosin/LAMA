@@ -4,10 +4,12 @@
 # This source code is licensed under the license found in the
 # LICENSE file in the root directory of this source tree.
 #
-import torch
-from colorama import init
-from termcolor import colored
 import numpy as np
+import torch
+
+# from colorama import init
+from termcolor import colored
+
 import lama.modules.base_connector as base
 
 
@@ -15,21 +17,30 @@ def __exclude_tokens(token_ids, vocab):
     indices_to_exclude = []
     for i, tok in enumerate(token_ids):
         word_form = vocab[tok]
-        if (word_form in base.SPECIAL_SYMBOLS):
+        if word_form in base.SPECIAL_SYMBOLS:
             indices_to_exclude.append(i)
     return indices_to_exclude
 
 
-def __print_generation(positional_scores, token_ids, vocab, rank_dict,
-                       index_max_probs, value_max_probs, topk,
-                       indices_to_exclude, masked_indices, print_on_console):
-    init()  # colorful output
+def __print_generation(
+    positional_scores,
+    token_ids,
+    vocab,
+    rank_dict,
+    index_max_probs,
+    value_max_probs,
+    topk,
+    indices_to_exclude,
+    masked_indices,
+    print_on_console,
+):
+    # init()  # colorful output
     msg = ""
     dash = '-' * 82
     msg += dash + "\n"
     msg += '{:<8s}{:<20s}{:<12s}{:<20}{:<12s}{:<12s}'.format(
-                    "index", "token", "log_prob", "prediction",
-                    "log_prob", "rank@{}".format(topk))
+        "index", "token", "log_prob", "prediction", "log_prob", "rank@{}".format(topk)
+    )
     msg += "\n" + dash
     if print_on_console:
         print(msg)
@@ -53,7 +64,7 @@ def __print_generation(positional_scores, token_ids, vocab, rank_dict,
             positional_scores[idx],
             str(vocab[predicted_token_id]),
             value_max_prob[0],
-            rank
+            rank,
         )
 
         if print_on_console:
@@ -75,12 +86,12 @@ def __get_topk(log_probs, topk):
     return value_max_probs, index_max_probs
 
 
-def print_sentence_predictions(log_probs, token_ids, vocab,
-                               masked_indices=None, print_generation=True,
-                               topk=1000):
+def print_sentence_predictions(
+    log_probs, token_ids, vocab, masked_indices=None, print_generation=True, topk=1000
+):
 
     msg = "\n"
-    log_probs = log_probs[:len(token_ids)]
+    log_probs = log_probs[: len(token_ids)]
     value_max_probs, index_max_probs = __get_topk(log_probs, topk)
 
     # remove special symbols from token_ids
@@ -106,7 +117,7 @@ def print_sentence_predictions(log_probs, token_ids, vocab,
     )
     positional_scores = token_probs.squeeze(-1).detach().numpy()
 
-    score_sum = 0.
+    score_sum = 0.0
     count = 0
     for idx, score in enumerate(positional_scores):
         if idx not in excluded_indices:
@@ -114,7 +125,7 @@ def print_sentence_predictions(log_probs, token_ids, vocab,
             count += 1
 
     if count > 0:
-        avg_nll_loss = - (score_sum / count)
+        avg_nll_loss = -(score_sum / count)
     else:
         avg_nll_loss = 0.0
     perplexity = np.exp(avg_nll_loss)
@@ -122,15 +133,24 @@ def print_sentence_predictions(log_probs, token_ids, vocab,
     # print("positional_scores: {}".format(positional_scores))
     # print("avg_nll_loss: {}".format(avg_nll_loss))
 
-    __print_generation(positional_scores, token_ids, vocab, rank_dict,
-                       index_max_probs, value_max_probs, topk,
-                       excluded_indices, masked_indices, print_generation)
+    __print_generation(
+        positional_scores,
+        token_ids,
+        vocab,
+        rank_dict,
+        index_max_probs,
+        value_max_probs,
+        topk,
+        excluded_indices,
+        masked_indices,
+        print_generation,
+    )
 
     # msg += return_msg
     msg += '| Perplexity: {:.3f}\n'.format(perplexity)
 
     if print_generation:
-        print("\n"+msg+"\n")
+        print("\n" + msg + "\n")
 
     return perplexity, msg
 
